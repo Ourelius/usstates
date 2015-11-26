@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>data :: US Cities</title>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+
+    <style>
+      body {
+        margin: 0;
+        font-family: "Fira Sans", Helvetica;
+      }
+
+      .states {
+        display: none;
+      }
+
+      .rotatee {
+        -webkit-transform: rotate(-90deg);
+        -moz-transform: rotate(-90deg);
+        -ms-transform: rotate(-90deg);
+        -o-transform: rotate(-90deg);
+        filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
+      }
+    </style>
+
+  </head>
+
+  <body>
+
+
+    <script>
+
+
+
+    d3.json("cities.json", function(data) {
+
+      var canvas = d3.select('body')
+          .append('svg')
+          .attr('width', 15000)
+          .attr('height', 7000)
+          .attr('style', 'background: #ddd;')
+          .append('g')
+          .attr('transform', 'translate(50, 50)');
+
+
+      // Reorgenize given data
+      var obj = {};
+
+      for(var i = 0; i < data.cities.length; i++){
+          if( !obj[data.cities[i].state] )
+                  obj[data.cities[i].state] = [];
+          obj[data.cities[i].state].push({
+              city: data.cities[i].city,
+              population: data.cities[i].population,
+          })
+      }
+      var res = {
+          allStates: []
+      }
+
+      for( var p in obj ){
+          if( obj.hasOwnProperty(p) )
+              res.allStates.push({
+                  stateName: p,
+                  state: obj[p]
+              });
+      }
+
+
+      var fObj = {
+        states: []
+      };
+
+      var rangeArr = [];
+
+      for( var i = 0; i < res.allStates.length; i++ ){
+        for( var j = 0; j < res.allStates[i].state.length; j++){
+          if( (j + 1) == res.allStates[i].state.length ) {
+            var rank = j + 1;
+          }
+        }
+
+        fObj.states.push({
+          state: res.allStates[i].stateName,
+          cities: rank
+        });
+
+        rangeArr.push(rank);
+
+      }
+
+
+      var circle = canvas.selectAll('circle')
+          .data(fObj.states)
+          .enter()
+          .append('circle')
+            .attr('r', function(d, i) { return d.cities / 1.3; })
+            .attr('cx', function(d, i) { var cx = i * 150; return cx; })
+            .attr('cy', function(d, i) { var cy = d.cities * 2; return cy; })
+            .attr('fill', '#b1b1b1');
+
+
+      // var heightScale = d3.scale.linear()
+      //     .domain([0, d3.max(rangeArr)])
+      //     .range([0, height]);
+
+      // var rect = canvas.selectAll('rect')
+      //     .data(fObj.states)
+      //     .enter()
+      //     .append('rect')
+      //       .attr('width', 20)
+      //       .attr('height', function(d, i) { return heightScale(d.cities); })
+      //       .attr('x', function(d, i) { var cx = i * 40; return cx; })
+      //       .attr('y', function(d, i) { return 0; })
+      //       .attr('fill', '#4d4d4d')
+      //       .attr('class', function(d, i) { return 'rect state'+i  });
+
+
+      var fSize = 17;
+      var text = canvas.selectAll('.states')
+        .data(fObj.states)
+        .enter()
+          .append('text')
+          .attr('class', function(d, i) { return 'text rotate'  })
+          .attr('font-size', fSize)
+          .attr('x', function(d, i) { var cx = i * 150; return cx; })
+          .attr('y', function(d, i) { var cy = d.cities * 2; return cy; })
+          .attr('fill', '#4d4d4d')
+          .text(function(d, i) {
+            return d.state + ' (' + d.cities + ')';
+          });
+
+
+          // var fSize = 10;
+          // var text = canvas.selectAll('.states')
+          //   .data(fObj.states)
+          //   .enter()
+          //     .append('text')
+          //     .attr('class', function(d, i) { return 'text rotate'  })
+          //     .attr('font-size', fSize)
+          //     .attr('x', -100)
+          //     .attr('y', function(d, i) { var cx = i * 35; return cx; })
+          //     .attr('fill', '#4d4d4d')
+          //     .text(function(d, i) {
+          //       return d.state + ' (' + d.cities + ')';
+          //     });
+
+
+    });
+
+
+
+      </script>
+
+
+  </body>
+
+</html>

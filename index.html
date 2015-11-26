@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>data :: US Cities</title>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+
+    <style>
+      body {
+        margin: 0;
+        font-family: "Fira Sans", Helvetica;
+        background: #021C35;
+      }
+
+      .states {
+        display: none;
+      }
+
+      .wrapper {
+        width: 100%;
+        margin: 100px auto;
+        text-align: center;
+      }
+
+      h1 {
+        color: #50ABF1;
+        font-size: 40px;
+      }
+    </style>
+
+  </head>
+
+  <body>
+
+    <div class="wrapper">
+      <h1>Prototype: D3js</h1>
+    </div>
+
+
+    <script>
+
+    var windowWidth   = $(window).width(),
+        windowHeight  = $(window).height();
+
+
+
+
+    d3.json("cities.json", function(data) { // request data
+
+      // Set canvas
+      var canvas = d3.select('body')
+          .append('svg')
+          .attr('width', windowWidth)
+          .attr('height', 500)
+          .append('g');
+
+      // Reorgenize given data
+      var obj = {};
+
+      for(var i = 0; i < data.cities.length; i++){
+          if( !obj[data.cities[i].state] )
+                  obj[data.cities[i].state] = [];
+          obj[data.cities[i].state].push({
+              city: data.cities[i].city,
+              population: data.cities[i].population,
+          })
+      }
+      var res = {
+          allStates: []
+      }
+
+      for( var p in obj ){
+          if( obj.hasOwnProperty(p) )
+              res.allStates.push({
+                  stateName: p,
+                  state: obj[p]
+              });
+      }
+
+
+      var fObj = {
+        states: []
+      };
+
+      var rangeArr = [];
+
+      for( var i = 0; i < res.allStates.length; i++ ){
+        for( var j = 0; j < res.allStates[i].state.length; j++){
+          if( (j + 1) == res.allStates[i].state.length ) {
+            var rank = j + 1;
+          }
+        }
+
+        fObj.states.push({
+          state: res.allStates[i].stateName,
+          cities: rank
+        });
+
+        rangeArr.push(rank);
+
+      }
+
+      console.log(rangeArr);
+
+      var maxRank = d3.max(rangeArr);
+
+      var fill = d3.scale.linear()
+          .domain([0, maxRank])
+          .range(["#50ABF1", "#021C35"]);
+
+
+      var circle = canvas.selectAll('circle')
+          .data(fObj.states)
+          .enter()
+          .append('circle')
+            .attr('r', function(d, i) {
+              return d.cities / 1.3;
+            })
+            .attr('cx', function(d, i) {
+              var cx = windowWidth / 2;
+              return cx;
+            })
+            .attr('cy', function(d, i) {
+              var cy = windowHeight / 4;
+              return cy;
+            })
+            .attr('stroke', function(d) { return 'rgba(255,255,255)'; })
+            .attr('fill', function(d) { return fill(d.cities); });
+
+    });
+
+
+
+      </script>
+
+
+  </body>
+
+</html>

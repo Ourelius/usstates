@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>data :: US Cities</title>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+
+    <style>
+      body {
+        margin: 0;
+      }
+    </style>
+
+  </head>
+
+  <body>
+
+
+    <script>
+
+
+
+    d3.json("cities.json", function(data) {
+
+      var canvas = d3.select('body')
+          .append('svg')
+          .attr('width', 6000)
+          .attr('height', 6000)
+          .attr('style', 'background: #ddd;')
+          .append('g')
+          .attr('transform', 'translate(200, 200)');
+
+
+      // Reorgenize given data
+      var obj = {};
+
+      for(var i = 0; i < data.cities.length; i++){
+          if( !obj[data.cities[i].state] )
+                  obj[data.cities[i].state] = [];
+          obj[data.cities[i].state].push({
+              city: data.cities[i].city,
+              population: data.cities[i].population,
+          })
+      }
+      var res = {
+          allStates: []
+      }
+
+      for( var p in obj ){
+          if( obj.hasOwnProperty(p) )
+              res.allStates.push({
+                  stateName: p,
+                  state: obj[p]
+              });
+      }
+
+      //console.log(res.allStates);
+
+
+      // for( var i = 0; i < res.allStates.length; i++ ){
+      //   console.log('Name of the State: ' + res.allStates[i].stateName);
+      //
+      //   for( var j = 0; j < res.allStates[i].state.length; j++){
+      //     console.log('City #' + j + ': ' + res.allStates[i].state[j].city)
+      //     console.log('Population #' + j + ': ' + res.allStates[i].state[j].population)
+      //     if( (j + 1) == res.allStates[i].state.length ) {
+      //       console.log(j + 1);
+      //     }
+      //
+      //   }
+      // }
+
+
+      var fObj = {
+        states: []
+      };
+
+      var rangeArr = [];
+
+      for( var i = 0; i < res.allStates.length; i++ ){
+        for( var j = 0; j < res.allStates[i].state.length; j++){
+          if( (j + 1) == res.allStates[i].state.length ) {
+            var rank = j + 1;
+          }
+        }
+
+        fObj.states.push({
+          state: res.allStates[i].stateName,
+          cities: rank
+        });
+
+        rangeArr.push(rank);
+
+      }
+
+
+      // var circle = canvas.selectAll('circle')
+      //     .data(fObj.states)
+      //     .enter()
+      //     .append('circle')
+      //       .attr('r', function(d, i) { return d.cities / 1.3; })
+      //       .attr('cx', function(d, i) { var cx = i * 80; return cx; })
+      //       .attr('cy', function(d, i) { var cy = d.cities * 3.5; return cy; });
+
+
+      var rect = canvas.selectAll('rect')
+          .data(fObj.states)
+          .enter()
+          .append('rect')
+            .attr('width', 20)
+            .attr('height', function(d, i) { return d.cities * 2; })
+            .attr('x', function(d, i) { var cx = i * 25; return cx; })
+            .attr('y', function(d, i) { return d3.max(rangeArr) - (d.cities * 2) })
+            .attr('class', 'rect');
+
+
+      var fSize = 13;
+      var text = canvas.selectAll('text')
+        .data(fObj.states)
+        .enter()
+          .append('text')
+          .attr('font-size', fSize)
+          .attr('x', function(d, i) { var cx = i * 25; return cx; })
+          .attr('y', function(d, i) { return (d3.max(rangeArr) - (d.cities * 2)) - (fSize * 2) })
+          .attr('fill', 'red')
+          .text(function(d, i) {
+            return d.state + ' (' + d.cities + ')';
+          });
+
+
+
+    });
+
+
+
+      </script>
+
+
+    <!-- <script>
+
+    var data = [10, 50, 80]
+    var r = 300;
+    //var p = Math.PI * 2;
+
+      var color = d3.scale.ordinal()
+          .range(['red', 'blue', 'orange']);
+
+      var canvas = d3.select('body')
+                    .append('svg')
+                    .attr('width', 1500)
+                    .attr('height', 1500);
+
+      var group = canvas.append('g')
+          .attr('transform', 'translate(300, 300)');
+
+      var arc = d3.svg.arc()
+          .innerRadius(r - 40)
+          .outerRadius(r);
+
+      var pie = d3.layout.pie()
+          .value(function(d) { return d;  });
+
+      var arcs = group.selectAll('.arc')
+          .data(pie(data))
+          .enter()
+          .append('g')
+          .attr('class', 'arc');
+
+      arcs.append('path')
+          .attr('d', arc)
+          .attr('fill', function(d) { return color(d.data); });
+
+      arcs.append('text')
+          .attr('transform', function(d) { return "translate(" + arc.centroid(d) + ")"; })
+          .attr('text-anchor', 'middle')
+          .attr('font-size', '1.5em')
+          .text(function(d) { return d.data; });
+
+    </script> -->
+
+
+
+    <!-- <script>
+
+      var canvas = d3.select('body')
+                    .append('svg')
+                    .attr('width', 600)
+                    .attr('height', 600);
+
+      var r = 100;
+      var p = Math.PI * 2;
+
+      var group = canvas.append('g')
+          .attr('transform', 'translate(100, 100)');
+
+      var arc = d3.svg.arc()
+          .innerRadius(r - 20)
+          .outerRadius(r)
+          .startAngle(0)
+          .endAngle(p - 0.5)
+
+      group.append('path')
+        .attr('d', arc);
+
+    </script> -->
+
+  <!-- <script>
+
+  var canvas = d3.select('body')
+                .append('svg')
+                .attr('width', 600)
+                .attr('height', 600);
+
+  var data = [
+    {
+      x: 10,
+      y: 20
+    },
+    {
+      x: 400,
+      y: 450
+    },
+    {
+      x: 300,
+      y: 100
+    },
+    {
+      x: 10,
+      y: 20
+    }
+  ];
+
+  var group = canvas.append('g')
+      .attr('transform', 'translate(100, 100)');
+
+  var line = d3.svg.line()
+      .x(function(d) { return d.x; })
+      .y(function(d) { return d.y; });
+
+  group.selectAll('path')
+    .data([data])
+    .enter()
+    .append('path')
+    .attr('d', line)
+    .attr('fill', 'none')
+    .attr('stroke', 'black')
+    .attr('stroke-width', 10)
+
+
+
+  </script> -->
+
+
+  <!--  <script>
+
+      d3.json('cities.json', function(data) {
+
+        var canvas = d3.select('body')
+                      .append('svg')
+                      .attr('width', 500)
+                      .attr('height', 5000)
+                      .append('g')
+                      .attr('transform', 'translate(50, 50)');
+
+        canvas.selectAll('circle')
+          .data(data)
+          .enter()
+            .append('circle')
+            .attr('r', function(d, i) {
+              var population = d.cities[1].population.replace(/,/g, '');
+              population = population / 1000;
+              return population;
+            })
+            .attr('y', function(d, i) { return i * 50; })
+            .attr('fill', 'blue');
+
+          canvas.selectAll('text')
+            .data(data)
+            .enter()
+              .append('text')
+              .attr('y', function(d, i) { return i * 50; })
+              .attr('fill', 'black')
+              .text(function(d, i) {
+                return d.cities[i].city;
+              });
+
+      });
+
+    </script>-->
+
+
+
+
+    <!--<script>
+
+      var data = [10, 20, 30, 40, 50];
+
+      console.log(data.sort(d3.descending));
+      console.log(d3.min(data));
+      console.log(d3.max(data));
+      console.log(d3.sum(data));
+      console.log(d3.mean(data));
+      console.log(d3.median(data));
+      console.log(d3.shuffle(data));
+
+    </script>-->
+
+
+    <!--<script>
+
+    var data = [10]
+
+      var canvas = d3.select('body')
+                    .append('svg')
+                    .attr('width', 500)
+                    .attr('height', 500);
+
+      var circle = canvas.append('circle')
+                    .attr('cx', 50)
+                    .attr('cy', 50)
+                    .attr('r', 25);
+
+      var circle = canvas.append('circle')
+                    .attr('cx', 100)
+                    .attr('cy', 100)
+                    .attr('r', 25);
+
+      circle.transition()
+            .duration(1500)
+            .attr('cx', 150)
+            .attr('start', function() {});
+
+    </script>-->
+
+
+
+
+
+
+
+
+
+    <!--<script>
+
+      var dataArray = [20, 40, 50, 60];
+
+      var width   = 500,
+          height  = 500;
+
+      var widthScale = d3.scale.linear()
+                        .domain([0, dataArray[3]])
+                        .range([0, width]);
+
+      var color = d3.scale.linear()
+                  .domain([0, dataArray[3]])
+                  .range(['red', 'blue']);
+
+      var axis = d3.svg.axis()
+                  .ticks(15)
+                  .scale(widthScale);
+
+      var canvas  = d3.select('body')
+                    .append('svg')
+                    .attr('width', width * 2)
+                    .attr('height', height)
+                    .attr('style', 'border: 1px solid #ddd;')
+                    .append('g')
+                    .attr('transform', 'translate(50, 50)');
+
+      var bars = canvas.selectAll('rect')
+                    .data(dataArray)
+                    .enter()
+                      .append('rect')
+                      .attr('width', function(d) { return widthScale(d); })
+                      .attr('height', 50)
+                      .attr('fill', function(d) { return color(d); })
+                      .attr('y', function(d, i) { return i * 100 })
+                      .attr('class', function(d, i) { return 'bar' + i });
+
+      canvas.append('g')
+            .attr('transform', 'translate(0, 400)')
+            .call(axis);
+
+    </script>-->
+
+  </body>
+
+</html>
